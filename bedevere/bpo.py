@@ -144,6 +144,17 @@ def create_hyperlink_in_comment_body(body):
         match = ISSUE_RE.search(leftover_body)
         if match is None:
             break
+        if leftover_body.find('`'):
+            first_backtick_pos = leftover_body.find('`')
+            if leftover_body.count('`') % 2 == 1:
+                new_body = new_body + leftover_body[:first_backtick_pos+1]
+                leftover_body = leftover_body[first_backtick_pos + 1:]
+                continue
+            elif first_backtick_pos <= match.start() and leftover_body.find('`', first_backtick_pos+1) >= match.end():
+                second_backtick_pos = leftover_body.find('`', first_backtick_pos + 1)
+                new_body = new_body + leftover_body[:second_backtick_pos+1]
+                leftover_body = leftover_body[second_backtick_pos + 1:]
+                continue
         presence = check_hyperlink(match)
         if presence is False:
             new_body = new_body + leftover_body[:match.start()]
